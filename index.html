@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meowcraft</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #f472b6;
+    --pink-light: #fce7f3;
+    --pink-dark: #be185d;
+    --pink-mid: #ec4899;
+    --purple: #7c3aed;
+    --purple-dark: #4c1d95;
+    --bg: #0f0a14;
+    --bg2: #1a0f2e;
+    --bg3: #130d1f;
+    --card: #1e1133;
+    --card2: #261545;
+    --text: #f9f0ff;
+    --text-muted: #b09dc0;
+    --pixel-shadow: 4px 4px 0 #7c3aed, 8px 8px 0 #4c1d95;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Pixel grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(244,114,182,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,114,182,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 64px;
+    background: rgba(15,10,20,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid rgba(244,114,182,0.15);
+  }
+
+  .nav-logo {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.75rem;
+    color: var(--pink);
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(244,114,182,0.6);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: color 0.2s, border-color 0.2s;
+    padding: 0 1.25rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a.active {
+    color: var(--pink);
+    border-bottom-color: var(--pink);
+  }
+
+  .btn-secondary-pink {
+    background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+    box-shadow: 0 0 24px rgba(124,58,237,0.4), 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .btn-secondary-pink:hover {
+    box-shadow: 0 0 36px rgba(124,58,237,0.6), 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .nav-join {
+    background: linear-gradient(135deg, var(--pink-mid), var(--pink-dark));
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 0 16px rgba(236,72,153,0.4);
+    white-space: nowrap;
+  }
+  .nav-join:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .nav-btn {
+    background: none;
+    color: var(--text-muted);
+    border: none;
+    padding: 0;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .nav-btn:hover { color: var(--text); }
+
+  /* ─── TAB PAGES ─── */
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /* Floating pixel particles */
+  .particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--pink);
+    opacity: 0;
+    animation: float-up var(--dur, 6s) var(--delay, 0s) infinite ease-in-out;
+    image-rendering: pixelated;
+  }
+
+  @keyframes float-up {
+    0%   { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.4; }
+    100% { opacity: 0; transform: translateY(-20vh) rotate(360deg); }
+  }
+
+  /* Radial glow */
+  .hero-glow {
+    position: absolute;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(244,114,182,0.18) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    50%       { opacity: 0.6; transform: translate(-50%,-50%) scale(1.15); }
+  }
+
+  .hero-logo {
+    width: min(90vw, 640px);
+    filter: drop-shadow(0 0 24px rgba(244,114,182,0.7));
+    animation: logo-drop 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+    position: relative;
+    z-index: 2;
+  }
+
+  @keyframes logo-drop {
+    from { opacity: 0; transform: translateY(-40px) scale(0.85); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .hero-subtitle {
+    margin-top: 1.5rem;
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    line-height: 1.6;
+    max-width: 480px;
+    animation: fade-up 0.8s 0.3s both;
+    position: relative;
+    z-index: 2;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fade-up 0.8s 0.5s both;
+    position: relative;
+    z-index: 2;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--pink-mid), var(--pink-dark));
+    color: #fff;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1rem;
+    box-shadow: 0 0 24px rgba(236,72,153,0.5), 0 4px 16px rgba(0,0,0,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 36px rgba(236,72,153,0.7), 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1rem;
+    border: 2px solid rgba(244,114,182,0.4);
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--pink);
+    transform: translateY(-3px);
+  }
+
+  /* IP Banner */
+  .ip-banner {
+    margin-top: 3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--card);
+    border: 2px solid rgba(244,114,182,0.25);
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    animation: fade-up 0.8s 0.7s both;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .ip-banner:hover { border-color: var(--pink); }
+
+  .ip-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: var(--pink);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .ip-value {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  .ip-copy {
+    background: rgba(244,114,182,0.15);
+    border: none;
+    color: var(--pink);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    transition: background 0.2s;
+  }
+
+  .ip-copy:hover { background: rgba(244,114,182,0.3); }
+
+  /* ─── SECTIONS ─── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 5rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    color: var(--pink);
+    text-align: center;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 0 16px rgba(244,114,182,0.5);
+  }
+
+  .section-sub {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 3rem;
+  }
+
+  /* ─── INFO CARDS ─── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .info-card {
+    background: var(--card);
+    border: 2px solid rgba(244,114,182,0.12);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink-mid), var(--purple));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .info-card:hover {
+    border-color: rgba(244,114,182,0.4);
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(244,114,182,0.1);
+  }
+
+  .info-card:hover::before { opacity: 1; }
+
+  .card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .card-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    color: var(--pink);
+    margin-bottom: 0.75rem;
+    letter-spacing: 1px;
+  }
+
+  .card-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .card-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-top: 0.5rem;
+  }
+
+  /* ─── HOW TO PLAY ─── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .step {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    background: var(--card);
+    border: 2px solid rgba(244,114,182,0.12);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    transition: border-color 0.2s;
+    animation: fade-up 0.5s both;
+  }
+
+  .step:hover { border-color: rgba(244,114,182,0.35); }
+
+  .step-num {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.2rem;
+    color: var(--pink);
+    min-width: 48px;
+    text-align: center;
+    text-shadow: 0 0 12px rgba(244,114,182,0.5);
+  }
+
+  .step-content h3 {
+    font-weight: 800;
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .step-content p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .step-content a {
+    color: var(--pink);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .step-content a:hover { text-decoration: underline; }
+
+  /* ─── FAQ ─── */
+  .faq-list {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .faq-item {
+    background: var(--card);
+    border: 2px solid rgba(244,114,182,0.12);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .faq-q {
+    padding: 1.25rem 1.5rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .faq-q:hover { background: rgba(244,114,182,0.05); }
+
+  .faq-q span.arrow {
+    color: var(--pink);
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+  }
+
+  .faq-item.open .arrow { transform: rotate(180deg); }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.3s;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    padding: 0 1.5rem;
+  }
+
+  .faq-item.open .faq-a {
+    max-height: 400px;
+    padding: 0 1.5rem 1.25rem;
+  }
+
+  .faq-item.open .faq-a-video {
+    max-height: 700px;
+  }
+
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #0f0a14;
+    border: 2px solid rgba(244,114,182,0.2);
+    transform: scaleY(0);
+    transform-origin: top;
+    max-height: 0;
+    transition: transform 0.35s ease, max-height 0.35s ease;
+  }
+
+  .faq-item.open .video-wrap {
+    transform: scaleY(1);
+    max-height: 500px;
+  }
+
+  .faq-a-video {
+    padding-top: 0 !important;
+  }
+
+  @keyframes footer-logo-float {
+    0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 8px rgba(244,114,182,0.5)); }
+    50%       { transform: translateY(-5px); filter: drop-shadow(0 0 16px rgba(244,114,182,0.9)); }
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 2px solid rgba(244,114,182,0.1);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  footer .footer-logo {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.65rem;
+    color: var(--pink);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--pink-mid);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 9999;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── SECTION DIVIDER ─── */
+  .divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(244,114,182,0.2), transparent);
+    margin: 0 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    background: rgba(244,114,182,0.15);
+    border: 1px solid rgba(244,114,182,0.3);
+    color: var(--pink);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.5rem;
+  }
+
+  .fade-item {
+    animation: fade-up 0.5s both;
+    animation-play-state: paused;
+  }
+  .fade-item.animate {
+    animation-play-state: running;
+  }
+
+  @keyframes warning-pulse {
+    0%, 100% { transform: scale(1) rotate(-3deg); filter: drop-shadow(0 0 0px rgba(244,114,182,0)); }
+    50%       { transform: scale(1.18) rotate(3deg); filter: drop-shadow(0 0 10px rgba(244,114,182,0.7)); }
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    .hero-actions { flex-direction: column; align-items: center; }
+    .ip-banner { flex-direction: column; gap: 0.5rem; }
+    .step { flex-direction: column; gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><img src="meowcraftlogo.png" alt="MeowCraft" style="height:36px;filter:drop-shadow(0 0 8px rgba(244,114,182,0.5));"></div>
+  <ul class="nav-links">
+    <li><a href="#" class="active" onclick="showTab('home',this);return false;">Главная</a></li>
+    <li><a href="#" onclick="showTab('howto',this);return false;">Как играть</a></li>
+    <li><a href="#" onclick="showTab('faq',this);return false;">FAQ</a></li>
+    <li><a href="#" onclick="showTab('about',this);return false;">О нас</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="https://forms.gle/WPUvspJpvW8gwVp87" target="_blank" class="nav-join">🐱 Стать частью сервера</a>
+  </div>
+</nav>
+
+<!-- ═══ TAB: ГЛАВНАЯ ═══ -->
+<div class="tab-page active" id="tab-home">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="particles" id="particles"></div>
+  <div class="hero-glow"></div>
+
+  <img src="meowcraftlogo.png" alt="MeowCraft" class="hero-logo"
+       onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block'">
+  <div id="fallback-logo" style="display:none; font-family:'Press Start 2P',monospace; font-size:2rem; color:var(--pink); text-shadow:var(--pixel-shadow); margin-bottom:1rem;">🐱 MeowCraft</div>
+
+  <p class="hero-subtitle">
+    Приватный Minecraft сервер с модами.<br>
+  </p>
+
+  <div class="hero-actions">
+    <a href="https://forms.gle/WPUvspJpvW8gwVp87" target="_blank" class="btn-primary">🐱 Стать частью сервера</a>
+    <a href="#" class="btn-primary btn-secondary-pink">🐾 Как начать играть</a>
+    <a href="https://drive.google.com/file/d/14YJ_vFK6BPksNQ-52-tquPSTaW2jqM8a/view?usp=sharing" target="_blank" class="btn-outline">📦 Скачать моды</a>
+  </div>
+
+  <div style="margin-top:3rem;display:flex;flex-direction:column;align-items:center;gap:0.5rem;position:relative;z-index:2;">
+    <div id="server-status" style="display:inline-flex;align-items:center;gap:0.75rem;background:var(--card);border:2px solid rgba(244,114,182,0.2);border-radius:12px;padding:0.75rem 1.5rem;animation:fade-up 0.8s 0.65s both;min-width:260px;justify-content:center;">
+      <span id="status-dot" style="width:10px;height:10px;border-radius:50%;background:#6b7280;display:inline-block;flex-shrink:0;"></span>
+      <span id="status-text" style="font-size:0.88rem;font-weight:700;color:var(--text-muted);">Загрузка...</span>
+    </div>
+
+    <div class="ip-banner" onclick="copyIP()" style="margin-top:0;">
+      <div>
+        <div class="ip-label">IP адрес</div>
+        <div class="ip-value">meowserver.minerent.io</div>
+      </div>
+      <button class="ip-copy">📋 Скопировать</button>
+    </div>
+  </div>
+
+  <div style="margin-top:1.25rem;display:inline-flex;align-items:center;gap:0.75rem;background:rgba(239,68,68,0.12);border:2px solid rgba(239,68,68,0.5);border-radius:12px;padding:0.85rem 1.5rem;max-width:480px;animation:fade-up 0.8s 0.85s both;position:relative;z-index:2;">
+    <span style="font-size:1.4rem;flex-shrink:0;">📦</span>
+    <p style="color:#fca5a5;font-size:0.88rem;line-height:1.5;font-weight:600;text-align:left;">Сборка модов может периодически меняться - следите за обновлениями!</p>
+  </div>
+
+  <div style="margin-top:0.75rem;display:inline-flex;align-items:center;gap:0.75rem;background:rgba(239,68,68,0.12);border:2px solid rgba(239,68,68,0.5);border-radius:12px;padding:0.85rem 1.5rem;max-width:480px;animation:fade-up 0.8s 0.9s both;position:relative;z-index:2;">
+    <span style="font-size:1.4rem;flex-shrink:0;">🚧</span>
+    <p style="color:#fca5a5;font-size:0.88rem;line-height:1.5;font-weight:600;text-align:left;">Сайт ещё не закончен - могут встречаться ошибки и недоработки. Спасибо за понимание!</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ABOUT CARDS -->
+<section id="about">
+  <div class="section-title">О сервере</div>
+  <p class="section-sub">Всё, что нужно знать перед входом</p>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="card-icon">🎮</span>
+      <div class="card-title">Версия</div>
+      <div class="card-value">Minecraft 26.2 snapshot 7</div>
+      <p class="card-text">Fabric - современный мод-загрузчик с широкой поддержкой модов.</p>
+    </div>
+    <div class="info-card">
+      <span class="card-icon">🔒</span>
+      <div class="card-title">Тип сервера</div>
+      <div class="card-value">Приватный</div>
+      <p class="card-text">Только для своих. Никаких грифером и читеров - только проверенные котики.</p>
+    </div>
+    <div class="info-card">
+      <span class="card-icon">📦</span>
+      <div class="card-title">Моды</div>
+      <div class="card-value">Сборка модов</div>
+      <p class="card-text">Готовая сборка. Скачай и просто играй. Всё настроено за тебя.</p>
+    </div>
+    <div class="info-card">
+      <span class="card-icon">🌐</span>
+      <div class="card-title">IP Адрес</div>
+      <div class="card-value" style="font-size:0.9rem;">meowserver.minerent.io</div>
+      <p class="card-text">Подключайся через лаунчер Minecraft с установленными модами.</p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /tab-home -->
+
+<!-- ═══ TAB: КАК ИГРАТЬ ═══ -->
+<div class="tab-page" id="tab-howto">
+<section>
+  <div style="margin-bottom:1.5rem;">
+    <a href="#" onclick="showTab('home',null);return false;" style="color:var(--text-muted);text-decoration:none;font-weight:700;font-size:0.9rem;display:inline-flex;align-items:center;gap:0.4rem;">← На главную</a>
+  </div>
+  <div class="section-title">Как играть</div>
+  <p class="section-sub">Следуй шагам - и ты уже в игре 🐾</p>
+
+  <div style="text-align:center;margin-bottom:2.5rem;">
+    <a href="https://forms.gle/WPUvspJpvW8gwVp87" target="_blank" class="btn-primary" style="display:inline-block;">🐱 Стать частью сервера</a>
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.75rem;">Сначала подай заявку - потом заходи!</p>
+  </div>
+
+  <div class="steps">
+    <div class="step" style="animation-delay:0.1s">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <h3>Установи Minecraft 26.2 snapshot 7</h3>
+        <p>Убедись, что у тебя установлен Minecraft Java Edition версии 26.2 snapshot 7.</p>
+      </div>
+    </div>
+    <div class="step" style="animation-delay:0.2s">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <h3>Установи Fabric</h3>
+        <p>Скачай и установи <a href="https://fabricmc.net/" target="_blank">Fabric</a> для версии 26.2 snapshot 7. Это мод-загрузчик, без него моды не запустятся.</p>
+      </div>
+    </div>
+    <div class="step" style="animation-delay:0.3s">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <h3>Скачай сборку модов</h3>
+        <p>Скачай готовую сборку модов и помести файлы в папку <code style="background:rgba(244,114,182,0.15);padding:0.1rem 0.4rem;border-radius:4px;color:var(--pink);">.minecraft/mods</code></p>
+        <p style="margin-top:0.5rem"><a href="https://drive.google.com/file/d/14YJ_vFK6BPksNQ-52-tquPSTaW2jqM8a/view?usp=sharing" target="_blank">📦 Скачать моды с Google Drive →</a></p>
+      </div>
+    </div>
+    <div class="step" style="animation-delay:0.4s">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <h3>Запусти игру через Fabric</h3>
+        <p>В лаунчере выбери профиль Fabric 26.2 snapshot 7 и запусти игру. Дождись полной загрузки.</p>
+      </div>
+    </div>
+    <div class="step" style="animation-delay:0.5s">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <h3>Подключись к серверу</h3>
+        <p>В главном меню выбери <strong>«Мультиплеер»</strong> → <strong>«Добавить сервер»</strong> и введи IP:</p>
+        <p style="margin-top:0.5rem">
+          <span onclick="copyIP()" style="background:var(--card2);border:2px solid rgba(244,114,182,0.3);border-radius:8px;padding:0.5rem 1rem;cursor:pointer;display:inline-flex;align-items:center;gap:0.75rem;font-family:'Press Start 2P',monospace;font-size:0.6rem;letter-spacing:1px;">
+            meowserver.minerent.io <span style="color:var(--pink);font-size:1rem;">📋</span>
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step warning-step" id="warning-block" style="margin-top:3rem;max-width:720px;margin-left:auto;margin-right:auto;border-color:rgba(244,114,182,0.45);background:linear-gradient(135deg,rgba(244,114,182,0.08),rgba(190,24,93,0.05));opacity:0;transform:translateY(30px) scale(0.97);transition:opacity 0.6s cubic-bezier(0.34,1.56,0.64,1),transform 0.6s cubic-bezier(0.34,1.56,0.64,1);">
+    <div style="min-width:64px;text-align:center;display:flex;align-items:center;justify-content:center;">
+      <span id="warning-icon" style="font-size:2.8rem;display:inline-block;animation:warning-pulse 2.2s ease-in-out infinite;">⚠️</span>
+    </div>
+    <div class="step-content">
+      <h3 style="color:var(--pink);font-family:'Press Start 2P',monospace;font-size:0.6rem;letter-spacing:1px;margin-bottom:0.6rem;">ВАЖНО</h3>
+      <p style="color:var(--text);font-size:0.95rem;line-height:1.7;">
+        Если что-то не работает - не паникуй. Убедись что версия Minecraft и Fabric совпадают
+        (<strong style="color:var(--pink);">26.2 snapshot 7</strong>), а все файлы модов лежат в папке
+        <code style="background:rgba(244,114,182,0.18);padding:0.15rem 0.5rem;border-radius:4px;color:var(--pink);font-size:0.9rem;">mods</code>.
+      </p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /tab-howto -->
+
+<!-- ═══ TAB: FAQ ═══ -->
+<div class="tab-page" id="tab-faq">
+<section>
+  <div style="margin-bottom:1.5rem;">
+    <a href="#" onclick="showTab('home',null);return false;" style="color:var(--text-muted);text-decoration:none;font-weight:700;font-size:0.9rem;display:inline-flex;align-items:center;gap:0.4rem;">← На главную</a>
+  </div>
+  <div class="section-title">FAQ</div>
+  <p class="section-sub">Часто задаваемые вопросы</p>
+
+  <div class="faq-list">
+    <div class="faq-item fade-item" style="animation-delay:0.1s">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        🎬 Как установить моды?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p style="margin-bottom:1.25rem;line-height:1.7;">Если не знаешь как установить моды - не проблема! Мы подготовили видео-гайд, где всё подробно показано по шагам.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+          <a href="https://www.youtube.com/watch?v=8D73JXj1kGE" target="_blank" class="btn-primary" style="display:inline-flex;align-items:center;gap:0.6rem;font-size:0.9rem;padding:0.75rem 1.5rem;text-decoration:none;">▶ Смотреть на YouTube</a>
+          <a href="https://retrotube.net/watch?v=3yC9670JagJQY" target="_blank" class="btn-outline" style="display:inline-flex;align-items:center;gap:0.6rem;font-size:0.9rem;padding:0.75rem 1.5rem;text-decoration:none;">▶ Смотреть на RetroTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="faq-item fade-item" style="animation-delay:0.2s">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Где взять моды?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        Все нужные моды находятся по <a href="https://drive.google.com/file/d/14YJ_vFK6BPksNQ-52-tquPSTaW2jqM8a/view?usp=sharing" target="_blank" style="color:var(--pink);">этой ссылке</a>. Скачай архив, распакуй и положи содержимое в папку <code style="color:var(--pink);">mods</code>.
+      </div>
+    </div>
+    <div class="faq-item fade-item" style="animation-delay:0.3s">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Какой лаунчер использовать?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+		Официальный лаунчер Minecraft с профилем Fabric 26.2 snapshot 7. Также подойдут сторонние лаунчеры (<a href="https://prismlauncher.ru/" target="_blank" style="color:var(--pink);">Prism Launcher</a>, <a href="https://elyprismlauncher.github.io/" target="_blank" style="color:var(--pink);">PineconeMC</a>, <a href="https://legacylauncher.ru/ru" target="_blank" style="color:var(--pink);">Legacy Launcher</a>, <a href="https://modrinth.com/" target="_blank" style="color:var(--pink);">Modrinth</a>  и др. Игра с Tlauncher не желательна.) - главное, чтобы версия была 26.2 snapshot 7 + Fabric.
+      </div>
+    </div>
+    <div class="faq-item fade-item" style="animation-delay:0.3s">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Игра вылетает при входе на сервер - что делать?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        Скорее всего, у тебя не хватает какого-то мода или неправильная версия. Убедись, что все файлы из архива находятся в папке mods и нет лишних модов, которых нет в сборке.
+      </div>
+    </div>
+    <div class="faq-item fade-item" style="animation-delay:0.4s">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Сервер не отображается / не могу подключиться
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        Проверь, правильно ли введён IP: <strong style="color:var(--text);">meowserver.minerent.io</strong>. Убедись, что сервер онлайн. Если проблема не уходит - обратись к администратору.
+      </div>
+    </div>
+    <div class="faq-item fade-item" style="animation-delay:0.5s">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Как попасть на сервер? Он приватный?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        Да, сервер приватный. Чтобы попасть, тебя должны добавить в вайтлист. Чтобы это произошло - нужно заполнить заявку.
+      </div>
+    </div>
+    <div class="faq-item fade-item" style="animation-delay:0.6s">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Кто играет?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        Meowcraft - это сервер для своих. Здесь играют друзья и знакомые, которым важна атмосфера уюта и доверия, а не толпа незнакомцев. Никакого чсв, никакого гриферства - только приятная компания, совместные постройки и вайб настоящего дружеского сервера.🐱
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /tab-faq -->
+
+<!-- ═══ TAB: О НАС ═══ -->
+<div class="tab-page" id="tab-about">
+<section>
+  <div style="margin-bottom:1.5rem;">
+    <a href="#" onclick="showTab('home',null);return false;" style="color:var(--text-muted);text-decoration:none;font-weight:700;font-size:0.9rem;display:inline-flex;align-items:center;gap:0.4rem;">← На главную</a>
+  </div>
+  <div class="section-title">О нас</div>
+  <p class="section-sub">Мы в социальных сетях 🐱</p>
+
+  <div class="info-grid" style="max-width:720px;margin:0 auto;">
+
+    <a href="https://t.me/+vOWJz2BVZcswYzUy" target="_blank" class="info-card fade-item" style="animation-delay:0.1s;text-decoration:none;cursor:pointer;">
+      <span class="card-icon">✈️</span>
+      <div class="card-title" style="color:#74b9f5;">Telegram</div>
+      <div class="card-value" style="font-size:1rem;">MeowCraft</div>
+      <p class="card-text" style="margin-top:0.5rem;">Новости, обновления и общение сообщества.</p>
+      <p style="color:#74b9f5;font-size:0.82rem;font-weight:700;margin-top:0.75rem;">Перейти →</p>
+    </a>
+
+    <a href="https://www.youtube.com/@MeowcraftServer" target="_blank" class="info-card fade-item" style="animation-delay:0.2s;text-decoration:none;cursor:pointer;">
+      <span class="card-icon">▶️</span>
+      <div class="card-title" style="color:#f87171;">YouTube</div>
+      <div class="card-value" style="font-size:1rem;">@MeowcraftServer</div>
+      <p class="card-text" style="margin-top:0.5rem;">Видео-гайды, летсплеи и обзоры обновлений сервера.</p>
+      <p style="color:#f87171;font-size:0.82rem;font-weight:700;margin-top:0.75rem;">Перейти →</p>
+    </a>
+
+    <div class="info-card fade-item" style="animation-delay:0.3s;opacity:0.5;cursor:not-allowed;">
+      <span class="card-icon">🎮</span>
+      <div class="card-title" style="color:var(--text-muted);">Discord</div>
+      <div class="card-value" style="font-size:1rem;color:var(--text-muted);">Скоро</div>
+      <p class="card-text" style="margin-top:0.5rem;">Дискорд-сервер пока в разработке. Следите за обновлениями!</p>
+      <p style="color:var(--text-muted);font-size:0.82rem;font-weight:700;margin-top:0.75rem;">Не готово</p>
+    </div>
+
+    <div class="info-card fade-item" style="animation-delay:0.4s;opacity:0.5;cursor:not-allowed;">
+      <span class="card-icon">🎵</span>
+      <div class="card-title" style="color:var(--text-muted);">TikTok</div>
+      <div class="card-value" style="font-size:1rem;color:var(--text-muted);">Скоро</div>
+      <p class="card-text" style="margin-top:0.5rem;">TikTok канал пока в разработке. Скоро будет!</p>
+      <p style="color:var(--text-muted);font-size:0.82rem;font-weight:700;margin-top:0.75rem;">Не готово</p>
+    </div>
+
+  </div>
+</section>
+</div><!-- /tab-about -->
+
+<!-- FOOTER -->
+<footer>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;max-width:1100px;margin:0 auto;">
+    <div style="text-align:left;">
+      <img src="meowcraftlogo.png" alt="MeowCraft" style="height:32px;filter:drop-shadow(0 0 8px rgba(244,114,182,0.5));margin-bottom:0.75rem;display:block;animation:footer-logo-float 3s ease-in-out infinite;">
+      <p>© Meowcraft 2026. Все права не защищены.</p>
+      <p style="margin-top:0.5rem;font-size:0.75rem;">Наш сервер не имеет никакого отношения к Mojang Studios.</p>
+      <p style="margin-top:0.5rem;font-size:0.8rem;"> <a href="mailto:meowcraftsupport@gmail.com" style="color:var(--pink);text-decoration:none;">meowcraftsupport@gmail.com</a></p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.75rem;">
+      <a href="https://forms.gle/BB7H2ZFJP67JEcKJ8" target="_blank" class="btn-outline" style="display:inline-flex;align-items:center;gap:0.6rem;text-decoration:none;font-size:0.9rem;white-space:nowrap;">💬 Обратная связь</a>
+      <a href="https://t.me/+vOWJz2BVZcswYzUy" target="_blank" class="btn-outline" style="display:inline-flex;align-items:center;gap:0.6rem;text-decoration:none;font-size:0.9rem;white-space:nowrap;border-color:rgba(51,144,236,0.4);color:#74b9f5;">✈️ Telegram канал</a>
+    </div>
+  </div>
+</footer>
+
+<!-- СОНЯ ДРУЖИНИНА -->
+<!-- TOAST -->
+<div class="toast" id="toast">✅ IP скопирован!</div>
+
+<script>
+  // Server status
+  async function fetchServerStatus() {
+    const dot = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    try {
+      const res = await fetch('https://api.mcsrvstat.us/3/meowserver.minerent.io');
+      const data = await res.json();
+      if (data.online) {
+        const online = data.players?.online ?? 0;
+        const max = data.players?.max ?? 0;
+        dot.style.background = '#4ade80';
+        dot.style.boxShadow = '0 0 8px rgba(74,222,128,0.7)';
+        text.style.color = '#4ade80';
+        text.textContent = `Онлайн - ${online} / ${max} игроков`;
+      } else {
+        dot.style.background = '#f87171';
+        dot.style.boxShadow = '0 0 8px rgba(248,113,113,0.7)';
+        text.style.color = '#f87171';
+        text.textContent = 'Сервер недоступен';
+      }
+    } catch {
+      dot.style.background = '#6b7280';
+      text.style.color = 'var(--text-muted)';
+      text.textContent = 'Извините, ';
+    }
+  }
+  fetchServerStatus();
+
+  // Particles
+  const container = document.getElementById('particles');
+  const colors = ['#f472b6','#ec4899','#be185d','#7c3aed','#fce7f3'];
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.setProperty('--dur', (5 + Math.random() * 8) + 's');
+    p.style.setProperty('--delay', (Math.random() * 8) + 's');
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width = p.style.height = (4 + Math.random() * 8) + 'px';
+    p.style.borderRadius = Math.random() > 0.5 ? '0' : '50%';
+    container.appendChild(p);
+  }
+
+  // Tab switching
+  function showTab(name, linkEl) {
+    document.querySelectorAll('.tab-page').forEach(t => t.classList.remove('active'));
+    const target = document.getElementById('tab-' + name);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    if (linkEl) {
+      linkEl.classList.add('active');
+    } else {
+      const map = { home: 0, howto: 1, faq: 2, about: 3 };
+      const links = document.querySelectorAll('.nav-links a');
+      if (links[map[name]]) links[map[name]].classList.add('active');
+    }
+    // Replay fade animations
+    if (name === 'faq' || name === 'about') {
+      document.querySelectorAll('#tab-' + name + ' .fade-item').forEach(el => {
+        el.classList.remove('animate');
+        void el.offsetWidth;
+        el.classList.add('animate');
+      });
+    }
+    if (name === 'howto') {
+      const wb = document.getElementById('warning-block');
+      if (wb) {
+        wb.style.opacity = '0';
+        wb.style.transform = 'translateY(30px) scale(0.97)';
+        setTimeout(() => {
+          wb.style.opacity = '1';
+          wb.style.transform = 'translateY(0) scale(1)';
+        }, 450);
+      }
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return false;
+  }
+
+  // Fix "Как начать играть" button
+  document.querySelector('.btn-secondary-pink').addEventListener('click', function(e) {
+    e.preventDefault();
+    showTab('howto', null);
+  });
+
+  // Copy IP
+  function copyIP() {
+    navigator.clipboard.writeText('meowserver.minerent.io').catch(() => {});
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // FAQ toggle
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+</script>
+</body>
+</html>
